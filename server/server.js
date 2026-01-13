@@ -22,15 +22,12 @@ app.use(clerkMiddleware())
 // Health check
 app.get('/', (req, res) => res.send("API Working"))
 
-// 🔥 1️⃣ Multipart routes MUST come first
-// Multer needs the raw stream, so no JSON parser here
 app.use('/api/educator', educatorRouter)
 
-// 🔥 2️⃣ Clerk webhooks must use RAW body (NOT express.json)
+// Clerk webhooks must use RAW body (NOT express.json)
 app.post('/clerk', express.raw({ type: '*/*' }), clerkWebhooks)
 
-// 🔥 3️⃣ JSON parser MUST be last
-// Only normal JSON APIs should use this
+// JSON parser MUST be last
 app.use(express.json())
 
 app.use('/api/course', express.json(), courseRouter)
