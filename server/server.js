@@ -28,11 +28,15 @@ app.use('/api/educator', educatorRouter)
 app.post('/clerk', express.raw({ type: '*/*' }), clerkWebhooks)
 
 // JSON parser MUST be last
+// Stripe webhook MUST come BEFORE express.json()
+app.post('/stripe', express.raw({ type: 'application/json' }), stripeWebhooks)
+
+// JSON parser after webhooks
 app.use(express.json())
 
-app.use('/api/course', express.json(), courseRouter)
-app.use('/api/user', express.json(), userRouter)
-app.post('/stripe', express.raw({ type: 'application/json'}), stripeWebhooks)
+app.use('/api/course', courseRouter)
+app.use('/api/user', userRouter)
+
 
 const PORT = process.env.PORT || 5000
 

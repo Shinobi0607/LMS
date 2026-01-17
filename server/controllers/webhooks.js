@@ -19,61 +19,67 @@ export const clerkWebhooks = async (req, res) => {
     const { data, type } = req.body
 
     switch (type) {
-        case 'user.created' : {
-            const userData = {
-                _id: data.id,
-                email: data.email_addresses[0].email_address,
-                name: data.first_name + " " + data.last_name,
-                imageUrl: data.image_url,
-            }
-            await User.create(userData)
-            res.json({})
-            break;
+      case 'user.created': {
+        const userData = {
+          _id: data.id,
+          email: data.email_addresses[0].email_address,
+          name: data.first_name + " " + data.last_name,
+          imageUrl: data.image_url,
         }
+        await User.create(userData)
+        res.json({})
+        break;
+      }
 
-        case 'user.updated': {
-            const userData = {
-                email: data.email_addresses[0].email_address,
-                name: data.first_name + " " + data.last_name,
-                imageUrl: data.image_url,
-            }
-            await User.findByIdAndUpdate(data.id, userData)
-            res.json({})
-            break;
+      case 'user.updated': {
+        const userData = {
+          email: data.email_addresses[0].email_address,
+          name: data.first_name + " " + data.last_name,
+          imageUrl: data.image_url,
         }
+        await User.findByIdAndUpdate(data.id, userData)
+        res.json({})
+        break;
+      }
 
-        case 'user.deleted' : {
-            await User.findByIdAndDelete(data.id)
-            res.json({})
-            break;
-        }
+      case 'user.deleted': {
+        await User.findByIdAndDelete(data.id)
+        res.json({})
+        break;
+      }
 
 
-        default:
-            break;
+      default:
+        break;
     }
 
   } catch (error) {
-    res.json({success: false, message: error.message})
+    res.json({ success: false, message: error.message })
   }
 }
 
 const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY)
 
-export const stripeWebhooks = async(request, response)=>{
+export const stripeWebhooks = async (request, response) => {
   const sig = request.headers['stripe-signature'];
 
   let event;
 
   try {
-    event = Stripe.webhooks.constructEvent(request.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+
+    event = stripe.webhooks.constructEvent(
+      request.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    )
   }
   catch (err) {
     response.status(400).send(`Webhook Error: ${err.message}`);
   }
 
   switch (event.type) {
-    case 'payment_intent.succeeded':{
+    case 'checkout.session.completed': {
       const paymentIntent = event.data.object;
       const paymentIntentId = paymentIntent.id;
 
@@ -99,7 +105,7 @@ export const stripeWebhooks = async(request, response)=>{
       break;
     }
 
-    case 'payment_intent.payment_failed':{
+    case 'payment_intent.payment_failed': {
       const paymentIntent = event.data.object;
       const paymentIntentId = paymentIntent.id;
 
@@ -113,12 +119,13 @@ export const stripeWebhooks = async(request, response)=>{
       purchaseData.status = 'failed'
       await purchaseData.save()
 
-      break;}
+      break;
+    }
     // ... handle other event types
     default:
       console.log(`Unhandled event type ${event.type}`);
   }
 
   // Return a response to acknowledge receipt of the event
-  response.json({received: true});
+  response.json({ received: true });
 }
