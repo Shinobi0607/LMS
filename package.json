@@ -1,16 +1,23 @@
 {
+  "name": "lms-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon api/index.js",
+    "start": "node api/index.js"
+  },
   "dependencies": {
-    "humanize-duration": "^3.33.2",
-    "quill": "^2.0.3",
-    "rc-progress": "^4.0.0",
-    "react-router-dom": "^7.11.0",
-    "react-simple-star-rating": "^5.1.7",
-    "react-youtube": "^10.1.0",
-    "uniqid": "^5.4.0"
+    "@clerk/express": "^1.7.62",
+    "cloudinary": "^2.8.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "mongoose": "^9.1.2",
+    "multer": "^2.0.2",
+    "stripe": "^20.1.2",
+    "svix": "^1.42.0"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.23",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.19"
+    "nodemon": "^3.1.11"
   }
 }
