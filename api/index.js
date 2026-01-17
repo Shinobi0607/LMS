@@ -7,9 +7,11 @@ import { clerkWebhooks, stripeWebhooks } from "../server/controllers/webhooks.js
 import educatorRouter from "../server/routes/educatorRoutes.js";
 import courseRouter from "../server/routes/courseRoute.js";
 import userRouter from "../server/routes/userRoutes.js";
+import { clerkMiddleware } from "@clerk/express";
 
 const app = express();
 app.use(cors());
+app.use(clerkMiddleware());
 
 // Connect once
 await connectDB();
@@ -31,6 +33,13 @@ app.use("/api/educator", educatorRouter);
 app.get("/", (req, res) => {
   res.send("LMS Backend Running on Vercel 🚀");
 });
+
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
 
 // ❌ NO app.listen()
 // ✅ Export app
