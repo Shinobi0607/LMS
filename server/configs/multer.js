@@ -1,27 +1,7 @@
-import multer from "multer"
-import fs from "fs"
+import multer from "multer";
 
-const uploadDir = "uploads"
+const storage = multer.memoryStorage();
 
-// Ensure uploads folder exists
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir)
-}
+const upload = multer({ storage });
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir)
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname)
-  }
-})
-
-const upload = multer({
-  storage,
-  limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB
-  }
-})
-
-export default upload
+export default upload;
